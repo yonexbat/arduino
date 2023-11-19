@@ -1,2 +1,2 @@
 # arduino
-Samples for arduino
+Arduino sample projects

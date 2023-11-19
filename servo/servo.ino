@@ -5,8 +5,8 @@ Servo speed;
 int servoPos = 1500;
 int newServoPos = 1500;
 
-int speedPos = 1500;
-int newSpeedPos = 1500;
+int speedPos = 1580;
+int newSpeedPos = 1580;
 
 unsigned long servoLastTime;
 
@@ -15,10 +15,19 @@ void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   Serial.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT);
+  setupServoAndEsc();
+}
+
+// Servo and electronic speed controller.
+void setupServoAndEsc()
+{
   servo.attach(5); 
   speed.attach(3);
   servoLastTime = millis(); 
 }
+
+// Setup wifi
+
 
 // the loop function runs over and over again forever
 void loop() {
