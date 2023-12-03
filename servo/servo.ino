@@ -6,12 +6,21 @@ Servo servo;
 Servo speed;
 int servoPos = 1500;
 int newServoPos = 1500;
-
+unsigned long servoLastTime;
 
 int speedPosNeutral = 1580;
 int speedPos = speedPosNeutral;
+int newSpeedPos = speedPosNeutral;
+int forwardSpeed = 1600;
+int backwardSpeed = 1480;
+unsigned long speedLastTime;
 
-unsigned long servoLastTime;
+unsigned int speedStateNeutral = 0;
+unsigned int speedStateForward = 1;
+unsigned int speedStateBackward = 2;
+unsigned int speedState =  speedStateNeutral;
+
+
 
 char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
@@ -73,6 +82,7 @@ void loop() {
   int command = readSerial();
   handleCommand(command);
   setServoPosition();
+  setEscSpeed();
   wifiLoop();
 }
 
@@ -180,22 +190,48 @@ void handleCommand(int command)
 
     //d
     case 100:
-      speedPos += 10;
-      speed.writeMicroseconds(speedPos);
+      speedState = speedStateForward;      
       break;
     
     //e
-    case 101:
-      speedPos += -10;
-      speed.writeMicroseconds(speedPos);
+    case 101:      
+      speedState = speedStateBackward;      
       break;
 
     //f
-    case 102:
-      speedPos = speedPosNeutral;
-      speed.writeMicroseconds(speedPos);
+    case 102:      
+      speedState = speedStateNeutral; 
+      speed.writeMicroseconds(speedPosNeutral);
       break;
   }
+}
+
+void setEscSpeed()
+{
+  unsigned long currentTime = millis();
+
+  if((currentTime - speedLastTime) <= 1500) {
+    return;
+  }
+  
+  if(speedState == speedStateNeutral)
+  {
+    speed.writeMicroseconds(speedPosNeutral);
+  }
+
+  if(speedState == speedStateForward)
+  {
+    speed.writeMicroseconds(forwardSpeed);
+    speedState = speedStateNeutral;
+  }
+
+  if(speedState == speedStateBackward)
+  {
+    speed.writeMicroseconds(backwardSpeed);
+    speedState = speedStateNeutral;
+  }
+
+  speedLastTime = millis();
 }
 
 void setServoPosition()
